@@ -11,7 +11,7 @@ val pushTypes: Map<String, Push> = mapOf(
 )
 
 fun main() {
-    val systemProperties: MutableMap<String, String> = parseData(MySystem.COUNT_PARAM)
+    val systemProperties: MutableMap<String, String> = parseData(MySystem.PROPERTIES_COUNT)
     val system: MySystem = MySystem.newInstance(systemProperties)
 
     val result: MutableList<Push> = mutableListOf()
@@ -46,35 +46,35 @@ abstract class Push {
     var type: String? = null
 
     companion object {
-        internal const val TEXT_FIELD_NAME = "text"
-        internal const val TYPE_FIELD_NAME = "type"
-        internal const val GENDER_FIELD_NAME = "gender"
-        internal const val AGE_FIELD_NAME = "age"
-        internal const val RADIUS_FIELD_NAME = "radius"
-        internal const val XCORD_FIELD_NAME = "x_coord"
-        internal const val YCORD_FIELD_NAME = "y_coord"
-        internal const val DATE_FIELD_NAME = "expiry_date"
-        internal const val OSVERSION_FIELD_NAME = "os_version"
+        internal const val AGE = "age"
+        internal const val GENDER = "gender"
+        internal const val OS_VERSION = "os_version"
+        internal const val RADIUS = "radius"
+        internal const val X_COORD = "x_coord"
+        internal const val Y_COORD = "y_coord"
+        internal const val DATE = "expiry_date"
+        internal const val TEXT = "text"
+        internal const val TYPE = "type"
     }
 
-    abstract fun newInstance(params: Map<String, String>): Push
+    abstract fun newInstance(properties: Map<String, String>): Push
     abstract fun filter(system: MySystem): Boolean
 }
 
 class LocationPush() : Push() {
-    var xCord: Float? = null
-    var yCord: Float? = null
+    var xCoord: Float? = null
+    var yCoord: Float? = null
     var radius: Int? = null
     var date: Long? = null
 
-    override fun newInstance(params: Map<String, String>): LocationPush {
+    override fun newInstance(properties: Map<String, String>): LocationPush {
         val push = LocationPush()
-        push.text = params[TEXT_FIELD_NAME]!!.toString()
-        push.type = params[TYPE_FIELD_NAME]!!.toString()
-        push.radius = params[RADIUS_FIELD_NAME]!!.toInt()
-        push.date = params[DATE_FIELD_NAME]!!.toLong()
-        push.xCord = params[XCORD_FIELD_NAME]!!.toFloat()
-        push.yCord = params[YCORD_FIELD_NAME]!!.toFloat()
+        push.text = properties[TEXT]!!.toString()
+        push.type = properties[TYPE]!!.toString()
+        push.radius = properties[RADIUS]!!.toInt()
+        push.date = properties[DATE]!!.toLong()
+        push.xCoord = properties[X_COORD]!!.toFloat()
+        push.yCoord = properties[Y_COORD]!!.toFloat()
         return push
     }
 
@@ -83,8 +83,8 @@ class LocationPush() : Push() {
     }
 
     private fun distanceFilter(system: MySystem): Boolean{
-        val distance = sqrt((system.xCord - xCord!!).pow(2) +
-                (system.yCord - yCord!!).pow(2))
+        val distance = sqrt((system.xCoord - xCoord!!).pow(2) +
+                (system.yCoord - yCoord!!).pow(2))
         return distance <= radius!!
     }
 }
@@ -93,12 +93,12 @@ class AgeSpecificPush : Push() {
     var age: Int? = null
     var date: Long? = null
 
-    override fun newInstance(params: Map<String, String>): AgeSpecificPush {
+    override fun newInstance(properties: Map<String, String>): AgeSpecificPush {
         val push = AgeSpecificPush()
-        push.text = params[TEXT_FIELD_NAME]!!.toString()
-        push.type = params[TYPE_FIELD_NAME]!!.toString()
-        push.age = params[AGE_FIELD_NAME]!!.toInt()
-        push.date = params[DATE_FIELD_NAME]!!.toLong()
+        push.text = properties[TEXT]!!.toString()
+        push.type = properties[TYPE]!!.toString()
+        push.age = properties[AGE]!!.toInt()
+        push.date = properties[DATE]!!.toLong()
         return push
     }
 
@@ -110,11 +110,11 @@ class AgeSpecificPush : Push() {
 class TechPush() : Push() {
     var osVersion: Int? = null
 
-    override fun newInstance(params: Map<String, String>): TechPush {
+    override fun newInstance(properties: Map<String, String>): TechPush {
         val push = TechPush()
-        push.text = params[TEXT_FIELD_NAME]!!.toString()
-        push.type = params[TYPE_FIELD_NAME]!!.toString()
-        push.osVersion = params[OSVERSION_FIELD_NAME]!!.toInt()
+        push.text = properties[TEXT]!!.toString()
+        push.type = properties[TYPE]!!.toString()
+        push.osVersion = properties[OS_VERSION]!!.toInt()
         return push
     }
 
@@ -129,14 +129,14 @@ class LocationAgePush() : Push() {
     var radius: Int? = null
     var age: Int? = null
 
-    override fun newInstance(params: Map<String, String>): LocationAgePush {
+    override fun newInstance(properties: Map<String, String>): LocationAgePush {
         val push = LocationAgePush()
-        push.text = params[TEXT_FIELD_NAME]!!.toString()
-        push.type = params[TYPE_FIELD_NAME]!!.toString()
-        push.radius = params[RADIUS_FIELD_NAME]!!.toInt()
-        push.age = params[AGE_FIELD_NAME]!!.toInt()
-        push.xCord = params[XCORD_FIELD_NAME]!!.toFloat()
-        push.yCord = params[YCORD_FIELD_NAME]!!.toFloat()
+        push.text = properties[TEXT]!!.toString()
+        push.type = properties[TYPE]!!.toString()
+        push.radius = properties[RADIUS]!!.toInt()
+        push.age = properties[AGE]!!.toInt()
+        push.xCord = properties[X_COORD]!!.toFloat()
+        push.yCord = properties[Y_COORD]!!.toFloat()
         return push
     }
 
@@ -145,8 +145,8 @@ class LocationAgePush() : Push() {
     }
 
     private fun distanceFilter(system: MySystem): Boolean{
-        val xDest: Float = system.xCord - xCord!!
-        val yDest: Float = system.yCord - yCord!!
+        val xDest: Float = system.xCoord - xCord!!
+        val yDest: Float = system.yCoord - yCord!!
         return sqrt(xDest * xDest + yDest * yDest) <= radius!!
     }
 }
@@ -154,11 +154,11 @@ class LocationAgePush() : Push() {
 class GenderPush() : Push(){
     var gender: String? = null
 
-    override fun newInstance(params: Map<String, String>): GenderPush {
+    override fun newInstance(properties: Map<String, String>): GenderPush {
         val push = GenderPush()
-        push.text = params[TEXT_FIELD_NAME]!!.toString()
-        push.type = params[TYPE_FIELD_NAME]!!.toString()
-        push.gender = params[GENDER_FIELD_NAME]!!.toString()
+        push.text = properties[TEXT]!!.toString()
+        push.type = properties[TYPE]!!.toString()
+        push.gender = properties[GENDER]!!.toString()
         return push
     }
 
@@ -171,12 +171,12 @@ class GenderAgePush() : Push(){
     var gender: String? = null
     var age: Int? = null
 
-    override fun newInstance(params: Map<String, String>): GenderAgePush {
+    override fun newInstance(properties: Map<String, String>): GenderAgePush {
         val push = GenderAgePush()
-        push.text = params[TEXT_FIELD_NAME]!!.toString()
-        push.type = params[TYPE_FIELD_NAME]!!.toString()
-        push.gender = params[GENDER_FIELD_NAME]!!.toString()
-        push.age = params[AGE_FIELD_NAME]!!.toInt()
+        push.text = properties[TEXT]!!.toString()
+        push.type = properties[TYPE]!!.toString()
+        push.gender = properties[GENDER]!!.toString()
+        push.age = properties[AGE]!!.toInt()
         return push
     }
 
@@ -190,18 +190,18 @@ data class MySystem(
     val age: Int,
     val gender: String,
     val osVersion: Int,
-    val xCord: Float,
-    val yCord: Float
+    val xCoord: Float,
+    val yCoord: Float
 ) {
     companion object {
-        const val COUNT_PARAM: Int = 6
-        fun newInstance(systemParams: Map<String, String>): MySystem = MySystem(
-            time = systemParams["time"]!!.toLong(),
-            age = systemParams["age"]!!.toInt(),
-            gender = systemParams["gender"]!!.toString(),
-            osVersion = systemParams["os_version"]!!.toInt(),
-            xCord = systemParams["x_coord"]!!.toFloat(),
-            yCord = systemParams["y_coord"]!!.toFloat()
+        const val PROPERTIES_COUNT: Int = 6
+        fun newInstance(systemProperties: Map<String, String>): MySystem = MySystem(
+            time = systemProperties["time"]!!.toLong(),
+            age = systemProperties["age"]!!.toInt(),
+            gender = systemProperties["gender"]!!.toString(),
+            osVersion = systemProperties["os_version"]!!.toInt(),
+            xCoord = systemProperties["x_coord"]!!.toFloat(),
+            yCoord = systemProperties["y_coord"]!!.toFloat()
         )
     }
 }
